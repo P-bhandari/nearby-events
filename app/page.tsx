@@ -1,7 +1,7 @@
 'use client';
+// oxlint-disable next/no-img-element -- Vinext's next/image client shim is unstable in development.
 
 import { useMemo, useState } from 'react';
-import Image from 'next/image';
 import { ArrowRight, ArrowUpRight, CalendarDays, Check, Clock3, Heart, MapPin, Plus, Sparkles, Ticket, X } from 'lucide-react';
 
 type Event = {
@@ -61,7 +61,7 @@ export default function Home() {
       </section>
 
       <section className="mx-auto w-full max-w-[1440px] px-5 pb-14 md:px-10 md:pb-20">
-        <Image src="/og.png" alt="Nearby Events editorial collage featuring the Brooklyn Bridge and Manhattan skyline" width={1536} height={1024} className="aspect-[3/2] w-full rounded-[2rem] object-cover shadow-[0_24px_70px_rgba(32,29,24,0.16)] md:aspect-[3/1]" />
+        <img src="/og.png" alt="Nearby Events editorial collage featuring the Brooklyn Bridge and Manhattan skyline" width="1536" height="1024" className="aspect-[3/2] w-full rounded-[2rem] object-cover shadow-[0_24px_70px_rgba(32,29,24,0.16)] md:aspect-[3/1]" />
       </section>
 
       <section id="saved" className="bg-ink px-5 py-16 text-white md:px-10 md:py-24"><div className="mx-auto grid w-full max-w-[1440px] gap-8 lg:grid-cols-[0.8fr_1.2fr]">
