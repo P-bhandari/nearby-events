@@ -1,0 +1,78 @@
+'use client';
+
+import { useMemo, useState } from 'react';
+import Image from 'next/image';
+import { ArrowRight, ArrowUpRight, CalendarDays, Check, Clock3, Heart, MapPin, Plus, Sparkles, Ticket, X } from 'lucide-react';
+
+type Event = {
+  id: number; day: string; date: string; time: string; title: string; venue: string;
+  neighborhood: string; borough: 'Brooklyn' | 'Manhattan'; category: 'Music' | 'Art' | 'Film' | 'Food';
+  price: string; tone: string; accent: string; plan: string;
+};
+
+const days = ['All week', 'Wed 2', 'Thu 3', 'Fri 4', 'Sat 5', 'Sun 6', 'Mon 7', 'Tue 8'];
+const events: Event[] = [
+  { id: 1, day: 'Wed 2', date: 'Wed, Sep 2', time: '7:00 PM', title: 'Sunset jazz on the roof', venue: 'Downtown Brooklyn', neighborhood: 'Downtown Brooklyn', borough: 'Brooklyn', category: 'Music', price: '$$', tone: 'bg-[#2e3c33]', accent: 'text-[#dfff62]', plan: 'Start with rooftop jazz at golden hour, then walk to Fort Greene for a late table and a shared dessert.' },
+  { id: 2, day: 'Thu 3', date: 'Thu, Sep 3', time: '6:30 PM', title: 'After-hours gallery crawl', venue: 'Chelsea galleries', neighborhood: 'Chelsea', borough: 'Manhattan', category: 'Art', price: 'Free', tone: 'bg-[#d8c9ff]', accent: 'text-[#34264d]', plan: 'Meet on 24th Street, wander through three late-opening galleries, and finish with natural wine nearby.' },
+  { id: 3, day: 'Fri 4', date: 'Fri, Sep 4', time: '8:15 PM', title: 'Indie film under the stars', venue: 'McCarren Park', neighborhood: 'Williamsburg', borough: 'Brooklyn', category: 'Film', price: '$', tone: 'bg-[#ee5e45]', accent: 'text-[#fff6df]', plan: 'Grab dumplings before the screening, bring a light blanket, then take a moonlit lap around the park.' },
+  { id: 4, day: 'Sat 5', date: 'Sat, Sep 5', time: '5:00 PM', title: 'Night market taste tour', venue: 'Uptown market hall', neighborhood: 'Harlem', borough: 'Manhattan', category: 'Food', price: '$$', tone: 'bg-[#f0b53e]', accent: 'text-[#3f2c08]', plan: 'Split three small plates, vote on the best bite, then catch the last set at a neighborhood jazz bar.' },
+  { id: 5, day: 'Sun 6', date: 'Sun, Sep 6', time: '4:00 PM', title: 'Sculpture walk + spritz', venue: 'Brooklyn Bridge Park', neighborhood: 'DUMBO', borough: 'Brooklyn', category: 'Art', price: 'Free', tone: 'bg-[#7fb4dc]', accent: 'text-[#102b40]', plan: 'Take the waterfront sculpture route at a slow pace, stop for skyline photos, then share a spritz at sunset.' },
+  { id: 6, day: 'Mon 7', date: 'Mon, Sep 7', time: '7:30 PM', title: 'Tiny room comedy night', venue: 'Lower East Side', neighborhood: 'LES', borough: 'Manhattan', category: 'Music', price: '$', tone: 'bg-[#222019]', accent: 'text-[#dfff62]', plan: 'Book the back row, compare favorite sets over noodles afterward, and skip the Monday-small-talk entirely.' },
+];
+
+export default function Home() {
+  const [day, setDay] = useState('All week');
+  const [borough, setBorough] = useState<'All' | Event['borough']>('All');
+  const [selected, setSelected] = useState<Event | null>(events[0]);
+  const [saved, setSaved] = useState<number[]>([1]);
+  const filtered = useMemo(() => events.filter((event) => (day === 'All week' || event.day === day) && (borough === 'All' || event.borough === borough)), [day, borough]);
+  const toggleSaved = (id: number) => setSaved((current) => current.includes(id) ? current.filter((item) => item !== id) : [...current, id]);
+
+  return (
+    <main className="min-h-screen overflow-hidden bg-background text-foreground">
+      <header className="mx-auto flex w-full max-w-[1440px] items-center justify-between px-5 py-5 md:px-10">
+        <a href="#top" className="flex items-center gap-3 font-semibold tracking-[-0.03em]"><span className="grid h-10 w-10 place-items-center rounded-full bg-primary text-primary-foreground"><Sparkles size={18} /></span><span className="text-lg">Nearby Events</span></a>
+        <div className="flex items-center gap-2"><span className="hidden rounded-full border border-border bg-card px-4 py-2 text-sm text-muted-foreground shadow-sm sm:block">Brooklyn + Manhattan</span><a href="#saved" className="inline-flex min-h-10 items-center gap-2 rounded-full bg-ink px-4 py-2 text-sm font-semibold text-white"><Heart size={15} fill={saved.length ? 'currentColor' : 'none'} /> {saved.length} saved</a></div>
+      </header>
+
+      <section id="top" className="mx-auto grid w-full max-w-[1440px] gap-8 px-5 pb-16 pt-8 md:px-10 lg:grid-cols-[0.9fr_1.1fr] lg:items-end lg:pt-16">
+        <div>
+          <p className="mb-5 flex items-center gap-2 text-xs font-bold uppercase tracking-[0.18em] text-accent-foreground"><CalendarDays size={14} /> Week of Sep 2–8</p>
+          <h1 className="max-w-2xl text-[clamp(3.5rem,8vw,7.5rem)] font-semibold leading-[0.86] tracking-[-0.075em]">Your week,<span className="block font-serif font-normal italic text-primary">planned.</span></h1>
+          <p className="mt-7 max-w-lg text-base leading-7 text-muted-foreground md:text-lg">The best concerts, screenings, pop-ups, and low-key gems—paired into date-night plans that actually make sense.</p>
+          <div className="mt-8 flex flex-wrap gap-2" aria-label="Filter by borough">{(['All', 'Brooklyn', 'Manhattan'] as const).map((item) => <button key={item} onClick={() => setBorough(item)} className={`min-h-11 rounded-full border px-5 py-2.5 text-sm font-semibold transition ${borough === item ? 'border-ink bg-ink text-white' : 'border-border bg-card hover:border-ink'}`}>{item}</button>)}</div>
+        </div>
+        <article className="relative overflow-hidden rounded-[2rem] bg-ink p-6 text-white shadow-[0_28px_80px_rgba(32,29,24,0.18)] md:p-9">
+          <div className="absolute -right-20 -top-24 h-72 w-72 rounded-full bg-coral/35 blur-3xl" /><div className="absolute -bottom-28 left-10 h-56 w-56 rounded-full bg-[#6550a8]/30 blur-3xl" />
+          <div className="relative"><div className="flex items-center justify-between gap-4"><span className="rounded-full bg-white/10 px-3 py-1.5 text-xs font-semibold uppercase tracking-[0.12em]">Editor’s pick</span><span className="text-sm text-white/60">Wednesday · 7:00 PM</span></div><div className="mt-20 md:mt-28"><p className="mb-3 flex items-center gap-2 text-sm text-lime"><MapPin size={15} /> Downtown Brooklyn</p><h2 className="max-w-xl text-3xl font-semibold leading-tight tracking-[-0.04em] md:text-5xl">Rooftop jazz, then a late table for two.</h2><button onClick={() => setSelected(events[0])} className="mt-7 inline-flex min-h-11 items-center gap-2 rounded-full bg-lime px-5 py-3 text-sm font-bold text-ink transition hover:-translate-y-0.5 hover:bg-white">See the plan <ArrowUpRight size={17} /></button></div></div>
+        </article>
+      </section>
+
+      <section className="border-y border-border bg-card/60 py-4"><div className="no-scrollbar mx-auto flex w-full max-w-[1440px] gap-2 overflow-x-auto px-5 md:px-10" aria-label="Filter by day">{days.map((item) => <button key={item} onClick={() => setDay(item)} className={`min-h-10 shrink-0 rounded-full px-4 text-sm font-semibold transition ${day === item ? 'bg-primary text-primary-foreground' : 'hover:bg-muted'}`}>{item}</button>)}</div></section>
+
+      <section className="mx-auto w-full max-w-[1440px] px-5 py-14 md:px-10 md:py-20">
+        <div className="mb-8 flex flex-wrap items-end justify-between gap-5"><div><p className="mb-2 text-xs font-bold uppercase tracking-[0.16em] text-muted-foreground">Curated nearby</p><h2 className="text-3xl font-semibold tracking-[-0.04em] md:text-5xl">Pick your energy.</h2></div><p className="rounded-full bg-accent px-4 py-2 text-xs font-semibold text-accent-foreground">Preview data · live sources next</p></div>
+        {filtered.length ? <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">{filtered.map((event, index) => (
+          <article key={event.id} className={`${event.tone} ${event.accent} group flex min-h-[360px] flex-col justify-between overflow-hidden rounded-[1.75rem] p-6 transition duration-300 hover:-translate-y-1 md:min-h-[400px] ${index === 0 && filtered.length > 3 ? 'lg:col-span-2' : ''}`}>
+            <div className="flex items-start justify-between gap-4"><div><p className="text-xs font-bold uppercase tracking-[0.14em] opacity-70">{event.category}</p><p className="mt-1 text-sm opacity-80">{event.date} · {event.time}</p></div><button onClick={() => toggleSaved(event.id)} aria-label={`${saved.includes(event.id) ? 'Remove' : 'Save'} ${event.title}`} className="grid h-11 w-11 place-items-center rounded-full bg-white/15 transition hover:bg-white/30"><Heart size={18} fill={saved.includes(event.id) ? 'currentColor' : 'none'} /></button></div>
+            <div><div className="mb-5 flex h-20 w-20 rotate-3 items-center justify-center rounded-[1.5rem] border border-current/20 bg-white/10 text-3xl font-serif italic transition group-hover:rotate-[-3deg]">{event.price}</div><h3 className="text-3xl font-semibold leading-[1.02] tracking-[-0.045em] md:text-4xl">{event.title}</h3><div className="mt-5 flex items-end justify-between gap-4 border-t border-current/20 pt-4"><p className="flex items-center gap-2 text-sm"><MapPin size={15} /> {event.neighborhood}</p><button onClick={() => setSelected(event)} className="grid h-11 w-11 shrink-0 place-items-center rounded-full bg-current transition group-hover:scale-105" aria-label={`Build a plan for ${event.title}`}><ArrowRight size={18} className="text-white mix-blend-difference" /></button></div></div>
+          </article>
+        ))}</div> : <div className="rounded-[1.75rem] border border-dashed border-border py-20 text-center"><Sparkles className="mx-auto mb-4 text-primary" /><h3 className="text-xl font-semibold">A quiet one—for now.</h3><p className="mt-2 text-muted-foreground">Try another day or switch boroughs.</p></div>}
+      </section>
+
+      <section className="mx-auto w-full max-w-[1440px] px-5 pb-14 md:px-10 md:pb-20">
+        <Image src="/og.png" alt="Nearby Events editorial collage featuring the Brooklyn Bridge and Manhattan skyline" width={1536} height={1024} className="aspect-[3/2] w-full rounded-[2rem] object-cover shadow-[0_24px_70px_rgba(32,29,24,0.16)] md:aspect-[3/1]" />
+      </section>
+
+      <section id="saved" className="bg-ink px-5 py-16 text-white md:px-10 md:py-24"><div className="mx-auto grid w-full max-w-[1440px] gap-8 lg:grid-cols-[0.8fr_1.2fr]">
+        <div><p className="mb-3 text-xs font-bold uppercase tracking-[0.16em] text-lime">The plan</p><h2 className="max-w-md text-4xl font-semibold leading-none tracking-[-0.05em] md:text-6xl">One great night, already figured out.</h2><p className="mt-6 max-w-md leading-7 text-white/60">Every pick gets a simple before-and-after, realistic travel time, and just enough structure to keep the night easy.</p></div>
+        <div className="rounded-[2rem] bg-[#302e28] p-6 md:p-9">{selected ? <><div className="flex items-start justify-between gap-4"><div><p className="text-sm text-lime">{selected.date} · {selected.time}</p><h3 className="mt-2 text-2xl font-semibold tracking-[-0.03em] md:text-3xl">{selected.title}</h3></div><button onClick={() => setSelected(null)} className="grid h-10 w-10 place-items-center rounded-full bg-white/10" aria-label="Close plan"><X size={18} /></button></div><p className="mt-8 text-lg leading-8 text-white/75">{selected.plan}</p><div className="mt-8 grid gap-3 sm:grid-cols-3"><PlanFact icon={<Clock3 size={18}/>} label="Start" value={selected.time}/><PlanFact icon={<MapPin size={18}/>} label="Area" value={selected.neighborhood}/><PlanFact icon={<Ticket size={18}/>} label="Budget" value={`${selected.price} for two`}/></div><button onClick={() => toggleSaved(selected.id)} className={`mt-6 inline-flex min-h-11 w-full items-center justify-center gap-2 rounded-full px-5 font-bold transition ${saved.includes(selected.id) ? 'bg-white text-ink' : 'bg-lime text-ink'}`}>{saved.includes(selected.id) ? <><Check size={17}/> Saved to your week</> : <><Plus size={17}/> Add to your week</>}</button></> : <button onClick={() => setSelected(events[0])} className="flex min-h-[300px] w-full flex-col items-center justify-center rounded-[1.5rem] border border-dashed border-white/20 text-white/60"><Plus className="mb-3" /> Pick an event to build your plan</button>}</div>
+      </div></section>
+      <footer className="bg-ink px-5 pb-10 text-white md:px-10"><div className="mx-auto flex max-w-[1440px] flex-wrap items-center justify-between gap-4 border-t border-white/10 pt-7 text-sm text-white/45"><p>Nearby Events · NYC date nights, minus the group chat.</p><p>Brooklyn + Manhattan · Weekly on Tuesdays</p></div></footer>
+    </main>
+  );
+}
+
+function PlanFact({ icon, label, value }: { icon: React.ReactNode; label: string; value: string }) {
+  return <div className="rounded-2xl bg-white/5 p-4"><span className="mb-6 block text-lime">{icon}</span><p className="text-xs uppercase tracking-wider text-white/45">{label}</p><p className="mt-1 font-semibold">{value}</p></div>;
+}
